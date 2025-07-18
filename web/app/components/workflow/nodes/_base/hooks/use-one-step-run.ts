@@ -303,7 +303,7 @@ const useOneStepRun = <T>({
           postData.files = files || []
         }
         else {
-          postData.inputs = submitData
+          postData.inputs = { ...data, ...submitData }
         }
         res = await singleNodeRun(appId!, id, postData) as any
       }
