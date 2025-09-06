@@ -23,13 +23,6 @@ const Panel: FC<NodePanelProps<PluginTriggerNodeType>> = ({
     isAuthenticated,
   } = useConfig(id, data)
 
-  // Convert output schema to VarItem format
-  const outputVars = Object.entries(outputSchema.properties || {}).map(([name, schema]: [string, any]) => ({
-    name,
-    type: schema.type || 'string',
-    description: schema.description || '',
-  }))
-
   return (
     <div className='mt-2'>
       {/* Dynamic Parameters Form - Only show when authenticated */}
@@ -51,33 +44,31 @@ const Panel: FC<NodePanelProps<PluginTriggerNodeType>> = ({
       {/* Output Variables - Always show */}
       <OutputVars>
         <>
-          {outputVars.map(varItem => (
-            <VarItem
-              key={varItem.name}
-              name={varItem.name}
-              type={varItem.type}
-              description={varItem.description}
-              isIndent={hasObjectOutput}
-            />
-          ))}
-          {Object.entries(outputSchema.properties || {}).map(([name, schema]: [string, any]) => (
-            <div key={name}>
-              {schema.type === 'object' ? (
-                <StructureOutputItem
-                  rootClassName='code-sm-semibold text-text-secondary'
-                  payload={{
-                    schema: {
-                      type: Type.object,
-                      properties: {
-                        [name]: schema,
-                      },
-                      additionalProperties: false,
+          {Object.entries(outputSchema.properties || {}).map(([name, schema]: [string, any]) =>
+            schema.type === 'object' ? (
+              <StructureOutputItem
+                key={name}
+                rootClassName='code-sm-semibold text-text-secondary'
+                payload={{
+                  schema: {
+                    type: Type.object,
+                    properties: {
+                      [name]: schema,
                     },
-                  }}
-                />
-              ) : null}
-            </div>
-          ))}
+                    additionalProperties: false,
+                  },
+                }}
+              />
+            ) : (
+              <VarItem
+                key={name}
+                name={name}
+                type={schema.type || 'string'}
+                description={schema.description || ''}
+                isIndent={hasObjectOutput}
+              />
+            ),
+          )}
         </>
       </OutputVars>
     </div>

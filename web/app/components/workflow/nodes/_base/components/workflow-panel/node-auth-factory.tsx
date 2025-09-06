@@ -107,7 +107,7 @@ const NodeAuth: FC<NodeAuthProps> = ({ data, onAuthorizationChange }) => {
     catch (error: any) {
       notify({
         type: 'error',
-        message: `Failed to configure authentication: ${error.message}`,
+        message: `Failed to configure authentication: ${error?.message || 'Unknown error'}`,
       })
     }
   }, [provider, initiateTriggerOAuth, invalidateSubscriptions, notify])
