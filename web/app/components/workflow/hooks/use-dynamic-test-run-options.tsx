@@ -3,14 +3,14 @@ import { useNodes } from 'reactflow'
 import { useTranslation } from 'react-i18next'
 import { BlockEnum, type CommonNodeType } from '../types'
 import { getWorkflowEntryNode } from '../utils/workflow-entry'
-import type { TestRunOptions, TriggerOption } from '../header/test-run-dropdown'
+import type { TestRunOptions, TriggerOption } from '../header/test-run-menu'
 import Home from '@/app/components/base/icons/src/vender/workflow/Home'
 import { Schedule, TriggerAll, WebhookLine } from '@/app/components/base/icons/src/vender/workflow'
 import AppIcon from '@/app/components/base/app-icon'
 import { useStore } from '../store'
 import { canFindTool } from '@/utils'
-import { CollectionType } from '@/app/components/tools/types'
 import useGetIcon from '@/app/components/plugins/install-plugin/base/use-get-icon'
+import { useAllTriggerPlugins } from '@/service/use-triggers'
 
 export const useDynamicTestRunOptions = (): TestRunOptions => {
   const { t } = useTranslation()
@@ -19,6 +19,7 @@ export const useDynamicTestRunOptions = (): TestRunOptions => {
   const customTools = useStore(s => s.customTools)
   const workflowTools = useStore(s => s.workflowTools)
   const mcpTools = useStore(s => s.mcpTools)
+  const { data: triggerPlugins } = useAllTriggerPlugins()
   const { getIconUrl } = useGetIcon()
 
   return useMemo(() => {
@@ -76,16 +77,8 @@ export const useDynamicTestRunOptions = (): TestRunOptions => {
         let icon
         let toolIcon: string | any
 
-        // 按照 use-workflow-search.tsx 的模式获取工具图标
         if (nodeData.provider_id) {
-          let targetTools = workflowTools
-          if (nodeData.provider_type === CollectionType.builtIn)
-            targetTools = buildInTools
-          else if (nodeData.provider_type === CollectionType.custom)
-            targetTools = customTools
-          else if (nodeData.provider_type === CollectionType.mcp)
-            targetTools = mcpTools
-
+          const targetTools = triggerPlugins || []
           toolIcon = targetTools.find(toolWithProvider => canFindTool(toolWithProvider.id, nodeData.provider_id!))?.icon
         }
 
@@ -166,5 +159,5 @@ export const useDynamicTestRunOptions = (): TestRunOptions => {
       triggers: allTriggers,
       runAll,
     }
-  }, [nodes, buildInTools, customTools, workflowTools, mcpTools, getIconUrl, t])
+  }, [nodes, buildInTools, customTools, workflowTools, mcpTools, triggerPlugins, getIconUrl, t])
 }
