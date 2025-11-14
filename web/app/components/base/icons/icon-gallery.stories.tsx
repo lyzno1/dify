@@ -12,6 +12,8 @@ type IconEntry = {
   Component: IconComponent
 }
 
+type PreviewTheme = 'light' | 'dark'
+
 const iconContext = require.context('./src', true, /\.tsx$/)
 
 const iconEntries: IconEntry[] = iconContext
@@ -235,6 +237,8 @@ const previewBaseStyle: React.CSSProperties = {
   alignItems: 'center',
   minHeight: 48,
   borderRadius: 6,
+  cursor: 'pointer',
+  transition: 'background-color 0.2s ease',
 }
 
 const nameButtonBaseStyle: React.CSSProperties = {
@@ -255,7 +259,8 @@ const formatIconCount = (count: number): string => `${count} ${count === 1 ? 'ic
 const IconGalleryStory = () => {
   const [query, setQuery] = React.useState('')
   const [copiedPath, setCopiedPath] = React.useState<string | null>(null)
-  const [previewTheme, setPreviewTheme] = React.useState<'light' | 'dark'>('light')
+  const [previewTheme, setPreviewTheme] = React.useState<PreviewTheme>('light')
+  const [previewOverrides, setPreviewOverrides] = React.useState<Record<string, PreviewTheme>>({})
 
   const filtered = React.useMemo(() => filterEntries(sortedEntries, query), [query])
 
@@ -286,6 +291,24 @@ const IconGalleryStory = () => {
         console.error('Failed to copy icon path:', err)
       })
   }, [])
+
+  const handleTogglePreviewBackground = React.useCallback((path: string) => {
+    setPreviewOverrides((prev) => {
+      const currentExplicit = prev[path]
+      const resolved = currentExplicit ?? previewTheme
+      const next: PreviewTheme = resolved === 'dark' ? 'light' : 'dark'
+
+      if (next === previewTheme) {
+        const { [path]: _removed, ...rest } = prev
+        return rest
+      }
+
+      return {
+        ...prev,
+        [path]: next,
+      }
+    })
+  }, [previewTheme])
 
   return (
     <div style={containerStyle}>
@@ -333,28 +356,42 @@ const IconGalleryStory = () => {
               <span style={categoryBadgeStyle}>{formatIconCount(categoryEntries.length)}</span>
             </div>
             <div style={gridStyle}>
-              {categoryEntries.map(entry => (
-                <div key={entry.path} style={cardStyle}>
-                  <div
-                    style={{
-                      ...previewBaseStyle,
-                      background: previewTheme === 'dark' ? '#1f2024' : '#fff',
-                    }}
-                  >
-                    <entry.Component style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE }} />
+              {categoryEntries.map((entry) => {
+                const resolvedPreviewTheme = previewOverrides[entry.path] ?? previewTheme
+                return (
+                  <div key={entry.path} style={cardStyle}>
+                    <div
+                      style={{
+                        ...previewBaseStyle,
+                        background: resolvedPreviewTheme === 'dark' ? '#1f2024' : '#fff',
+                      }}
+                      onClick={() => handleTogglePreviewBackground(entry.path)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+                          event.preventDefault()
+                          handleTogglePreviewBackground(entry.path)
+                        }
+                      }}
+                      aria-pressed={resolvedPreviewTheme === 'dark'}
+                      title="Click to toggle background"
+                    >
+                      <entry.Component style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE }} />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(entry.path)}
+                      style={{
+                        ...nameButtonBaseStyle,
+                        color: copiedPath === entry.path ? '#00754a' : '#24262c',
+                      }}
+                    >
+                      {copiedPath === entry.path ? 'Copied!' : entry.name}
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleCopy(entry.path)}
-                    style={{
-                      ...nameButtonBaseStyle,
-                      color: copiedPath === entry.path ? '#00754a' : '#24262c',
-                    }}
-                  >
-                    {copiedPath === entry.path ? 'Copied!' : entry.name}
-                  </button>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </section>
         )
