@@ -66,38 +66,102 @@ const groupByCategory = (entries: IconEntry[]) => entries.reduce((acc, entry) =>
 }, {} as Record<string, IconEntry[]>)
 
 const containerStyle: React.CSSProperties = {
-  padding: 24,
+  padding: '32px clamp(16px, 4vw, 56px)',
   display: 'flex',
   flexDirection: 'column',
-  gap: 24,
+  gap: 32,
+  minHeight: '100vh',
+  background: '#f6f7fb',
+  boxSizing: 'border-box',
 }
 
 const headerStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
+  gap: 16,
+  padding: '32px clamp(24px, 4vw, 40px)',
+  borderRadius: 28,
+  background: '#fff',
+  boxShadow: '0 24px 60px rgba(15, 19, 36, 0.08)',
+}
+
+const headerEyebrowStyle: React.CSSProperties = {
+  fontSize: 12,
+  textTransform: 'uppercase',
+  letterSpacing: 1,
+  color: '#8b8d98',
+  fontWeight: 600,
+}
+
+const headerTitleRowStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  flexWrap: 'wrap',
+  gap: 12,
+}
+
+const headerTitleStyle: React.CSSProperties = {
+  margin: 0,
+  fontSize: 34,
+  lineHeight: 1.2,
+}
+
+const headerBadgeStyle: React.CSSProperties = {
+  padding: '8px 14px',
+  borderRadius: 999,
+  background: '#eef2ff',
+  color: '#2d3ec7',
+  fontWeight: 600,
+  fontSize: 14,
+}
+
+const headerDescriptionStyle: React.CSSProperties = {
+  margin: 0,
+  color: '#5f5f66',
+  lineHeight: 1.5,
 }
 
 const controlsStyle: React.CSSProperties = {
   display: 'flex',
-  alignItems: 'center',
-  gap: 12,
+  alignItems: 'flex-end',
+  gap: 16,
   flexWrap: 'wrap',
 }
 
+const searchFieldStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 6,
+  flex: '1 1 320px',
+  minWidth: 260,
+}
+
+const searchLabelStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: '#6f7080',
+  fontWeight: 600,
+  letterSpacing: 0.4,
+  textTransform: 'uppercase',
+}
+
 const searchInputStyle: React.CSSProperties = {
-  padding: '8px 12px',
-  minWidth: 280,
-  borderRadius: 6,
-  border: '1px solid #d0d0d5',
+  padding: '10px 14px',
+  borderRadius: 10,
+  border: '1px solid #cfd2dc',
+  background: '#fff',
+  boxShadow: '0 2px 6px rgba(15, 19, 36, 0.05)',
 }
 
 const toggleButtonStyle: React.CSSProperties = {
-  padding: '8px 12px',
-  borderRadius: 6,
-  border: '1px solid #d0d0d5',
-  background: '#fff',
+  padding: '12px 20px',
+  borderRadius: 999,
+  border: 'none',
+  background: '#111322',
+  color: '#fff',
   cursor: 'pointer',
+  fontWeight: 600,
+  letterSpacing: 0.2,
 }
 
 const emptyTextStyle: React.CSSProperties = { color: '#5f5f66' }
@@ -105,7 +169,48 @@ const emptyTextStyle: React.CSSProperties = { color: '#5f5f66' }
 const sectionStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
+  gap: 16,
+}
+
+const sectionHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
   gap: 12,
+  padding: '8px 4px',
+  borderBottom: '1px solid #e4e5ec',
+  flexWrap: 'wrap',
+}
+
+const categoryTitleGroupStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
+}
+
+const categoryEyebrowStyle: React.CSSProperties = {
+  fontSize: 12,
+  textTransform: 'uppercase',
+  letterSpacing: 0.6,
+  color: '#a0a2b2',
+  margin: 0,
+}
+
+const categoryTitleStyle: React.CSSProperties = {
+  margin: 0,
+  fontSize: 16,
+  fontWeight: 600,
+  color: '#161823',
+  letterSpacing: -0.2,
+}
+
+const categoryBadgeStyle: React.CSSProperties = {
+  padding: '4px 10px',
+  borderRadius: 999,
+  background: '#f4f5fb',
+  color: '#4a4c63',
+  fontWeight: 600,
+  fontSize: 12,
 }
 
 const gridStyle: React.CSSProperties = {
@@ -145,6 +250,8 @@ const nameButtonBaseStyle: React.CSSProperties = {
 
 const PREVIEW_SIZE = 40
 
+const formatIconCount = (count: number): string => `${count} ${count === 1 ? 'icon' : 'icons'}`
+
 const IconGalleryStory = () => {
   const [query, setQuery] = React.useState('')
   const [copiedPath, setCopiedPath] = React.useState<string | null>(null)
@@ -183,19 +290,25 @@ const IconGalleryStory = () => {
   return (
     <div style={containerStyle}>
       <header style={headerStyle}>
-        <h1 style={{ margin: 0 }}>Icon Gallery</h1>
-        <p style={{ margin: 0, color: '#5f5f66' }}>
+        <span style={headerEyebrowStyle}>Collections</span>
+        <div style={headerTitleRowStyle}>
+          <h1 style={headerTitleStyle}>Icon Gallery</h1>
+          <span style={headerBadgeStyle}>{formatIconCount(filtered.length)}</span>
+        </div>
+        <p style={headerDescriptionStyle}>
           Browse all icon components sourced from <code>app/components/base/icons/src</code>. Use the search bar
           to filter by name or path.
         </p>
         <div style={controlsStyle}>
-          <input
-            style={searchInputStyle}
-            placeholder="Search icons"
-            value={query}
-            onChange={event => setQuery(event.target.value)}
-          />
-          <span style={{ color: '#5f5f66' }}>{filtered.length} icons</span>
+          <div style={searchFieldStyle}>
+            <span style={searchLabelStyle}>Search library</span>
+            <input
+              style={searchInputStyle}
+              placeholder="Search icons by name or file path"
+              value={query}
+              onChange={event => setQuery(event.target.value)}
+            />
+          </div>
           <button
             type="button"
             onClick={() => setPreviewTheme(prev => (prev === 'light' ? 'dark' : 'light'))}
@@ -208,35 +321,44 @@ const IconGalleryStory = () => {
       {categoryOrder.length === 0 && (
         <p style={emptyTextStyle}>No icons match the current filter.</p>
       )}
-      {categoryOrder.map(category => (
-        <section key={category} style={sectionStyle}>
-          <h2 style={{ margin: 0, fontSize: 18 }}>{category}</h2>
-          <div style={gridStyle}>
-            {grouped[category].map(entry => (
-              <div key={entry.path} style={cardStyle}>
-                <div
-                  style={{
-                    ...previewBaseStyle,
-                    background: previewTheme === 'dark' ? '#1f2024' : '#fff',
-                  }}
-                >
-                  <entry.Component style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE }} />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleCopy(entry.path)}
-                  style={{
-                    ...nameButtonBaseStyle,
-                    color: copiedPath === entry.path ? '#00754a' : '#24262c',
-                  }}
-                >
-                  {copiedPath === entry.path ? 'Copied!' : entry.name}
-                </button>
+      {categoryOrder.map((category) => {
+        const categoryEntries = grouped[category]
+        return (
+          <section key={category} style={sectionStyle}>
+            <div style={sectionHeaderStyle}>
+              <div style={categoryTitleGroupStyle}>
+                <span style={categoryEyebrowStyle}>Directory</span>
+                <h2 style={categoryTitleStyle}>{category}</h2>
               </div>
-            ))}
-          </div>
-        </section>
-      ))}
+              <span style={categoryBadgeStyle}>{formatIconCount(categoryEntries.length)}</span>
+            </div>
+            <div style={gridStyle}>
+              {categoryEntries.map(entry => (
+                <div key={entry.path} style={cardStyle}>
+                  <div
+                    style={{
+                      ...previewBaseStyle,
+                      background: previewTheme === 'dark' ? '#1f2024' : '#fff',
+                    }}
+                  >
+                    <entry.Component style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE }} />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(entry.path)}
+                    style={{
+                      ...nameButtonBaseStyle,
+                      color: copiedPath === entry.path ? '#00754a' : '#24262c',
+                    }}
+                  >
+                    {copiedPath === entry.path ? 'Copied!' : entry.name}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      })}
     </div>
   )
 }
