@@ -58,6 +58,13 @@ if $web_modified; then
     fi
 
     cd ./web || exit 1
+
+    echo "Running oxlint on web module"
+    if ! pnpm run lint:oxlint; then
+        echo "oxlint failed. Please run 'pnpm run lint:oxlint' to fix the errors."
+        exit 1
+    fi
+
     lint-staged
 
     if $web_ts_modified; then
