@@ -52,3 +52,17 @@ pnpm test
 - Backend architecture adheres to DDD and Clean Architecture principles.
 - Async work runs through Celery with Redis as the broker.
 - Frontend user-facing strings must use `web/i18n/en-US/`; avoid hardcoded text.
+
+## Cursor Cloud specific instructions
+
+PostgreSQL 16 and Redis 7 are installed on the VM and match `api/.env.example` (`postgres` / `difyai123456`, database `dify`, Redis on `127.0.0.1:6379` with that password). systemd is not running in this image, so services are started with `pg_ctlcluster` and `redis-server`, not `systemctl`. Do not start `docker/docker-compose.middleware.yaml` alongside them; it binds the same ports.
+
+On boot, the environment start script migrates the database and launches:
+
+- API on port 5001 (`/tmp/dify-api.log`)
+- Celery worker (`/tmp/dify-worker.log`)
+- Next.js dev server on port 3000 (`/tmp/dify-web.log`)
+
+`curl http://127.0.0.1:5001/health` checks the API. A fresh database opens http://localhost:3000/install to create the admin account. Backend commands use `uv run --project api`. Frontend commands run in `web/` with pnpm 10.19.0.
+
+Weaviate, the code sandbox, and the plugin daemon are not part of this environment. The studio can show a plugin-daemon connection error; account setup and the apps page still work. Dataset indexing and plugin installs need those extra services.
