@@ -12,7 +12,9 @@ Dify is an open-source platform for building LLM applications, agentic workflows
 
 Before changing code, sync `langgenius/dify` `main`. The environment start script adds an `upstream` remote when it is missing, fetches `upstream/main`, fast-forwards when the current checkout contains no local commits, and otherwise merges `upstream/main`. If that merge changes `pnpm-lock.yaml` or `api/uv.lock`, it refreshes dependencies.
 
-Web development runs from the repository root through Vite+. `vp`, `vpr`, and `vpx` are installed globally from the `vite-plus` version in `pnpm-workspace.yaml`. Start the frontend and the dev proxy together with:
+Web development runs from the repository root through Vite+. Install the global CLI with the official installer, pinned to the `vite-plus` version in `pnpm-workspace.yaml`. Do not install Node.js separately. `vp` reads `devEngines.runtime` and `packageManager` and supplies Node.js and pnpm. The `node`, `pnpm`, `vp`, `vpr`, and `vpx` commands on `PATH` are Vite+ shims.
+
+Start the frontend and the dev proxy together with:
 
 ```bash
 vpr dev
@@ -28,4 +30,4 @@ vpr dev
 
 Change `DEV_PROXY_TARGET` and `DEV_PROXY_PUBLIC_TARGET` together, then restart `vpr dev`. The proxy owns port 5001, so leave the local API stopped while it is running.
 
-Node `24.22.1`, pnpm `12.10.1`, and Python `3.13` match the repository pins. API dependencies are installed with `uv sync --project api --group dev` for backend work and are not started by default. Frontend tests use `vp test --project unit` from `web/`.
+Python `3.13` matches the API pin. API dependencies are installed with `uv sync --project api --group dev` for backend work and are not started by default. Frontend tests use `vp test --project unit` from `web/`.
